@@ -9,10 +9,9 @@ import com.booking.repository.ProviderProfileRepository;
 import com.booking.repository.ServiceRepository;
 import com.booking.service.BookingServiceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -41,11 +40,12 @@ public class BookingServiceServiceImpl implements BookingServiceService {
     }
 
     @Override
-    public List<ServiceResponse> getMyServices(Long userId) {
+    @Transactional(readOnly = true)
+    public Page<ServiceResponse> getMyServices(Long userId, Pageable pageable) {
         ProviderProfile profile = providerProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found."));
-        return serviceRepository.findByProviderProfileIdAndIsActiveTrue(profile.getId())
-                .stream().map(this::mapToResponse).collect(Collectors.toList());
+        return serviceRepository.findByProviderProfileIdAndIsActiveTrue(profile.getId(), pageable)
+                .map(this::mapToResponse);
     }
 
     @Override

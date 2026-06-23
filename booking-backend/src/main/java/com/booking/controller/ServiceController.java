@@ -6,12 +6,13 @@ import com.booking.entity.User;
 import com.booking.service.BookingServiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/provider/services")
@@ -27,8 +28,9 @@ public class ServiceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ServiceResponse>> getMyServices(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(bookingServiceService.getMyServices(currentUser.getId()));
+    public ResponseEntity<Page<ServiceResponse>> getMyServices(@AuthenticationPrincipal User currentUser,
+                                                               @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(bookingServiceService.getMyServices(currentUser.getId(), pageable));
     }
 
     @PutMapping("/{serviceId}")

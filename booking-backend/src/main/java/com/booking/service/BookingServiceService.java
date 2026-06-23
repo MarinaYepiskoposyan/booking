@@ -2,10 +2,11 @@ package com.booking.service;
 
 import com.booking.dto.request.ServiceRequest;
 import com.booking.dto.response.ServiceResponse;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface BookingServiceService {
     ServiceResponse addService(Long userId, ServiceRequest request);
-    List<ServiceResponse> getMyServices(Long userId);
+    Page<ServiceResponse> getMyServices(Long userId, Pageable pageable);
     ServiceResponse updateService(Long userId, Long serviceId, ServiceRequest request);
 }
