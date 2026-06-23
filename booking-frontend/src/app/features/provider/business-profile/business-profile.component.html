@@ -1,0 +1,37 @@
+<div class="form-container">
+  <h2>Business Profile</h2>
+  <div class="success-msg" *ngIf="success">Profile saved successfully!</div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Business Name *</label>
+      <input formControlName="businessName" placeholder="Your business name">
+      <span class="error" *ngIf="form.get('businessName')?.invalid && form.get('businessName')?.touched">
+        Business name is required
+      </span>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea formControlName="description" rows="3" placeholder="Describe your services..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <input formControlName="address" placeholder="Street address">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>City</label>
+        <input formControlName="city" placeholder="City">
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <input formControlName="country" placeholder="Country">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Website</label>
+      <input formControlName="website" placeholder="https://...">
+    </div>
+    <div class="error" *ngIf="error">{{ error }}</div>
+    <button type="submit">Save Business Profile</button>
+  </form>
+</div>

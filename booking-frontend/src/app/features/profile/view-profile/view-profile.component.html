@@ -1,0 +1,9 @@
+<div class="profile-card" *ngIf="user; else loading">
+  <h2>My Profile</h2>
+  <p><strong>Name:</strong> {{ user.firstName }} {{ user.lastName }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Phone:</strong> {{ user.phone || '—' }}</p>
+  <p><strong>Role:</strong> {{ user.role === 'PROVIDER' ? 'Service Provider' : 'Client' }}</p>
+  <a routerLink="/profile/edit" class="btn">Edit Profile</a>
+</div>
+<ng-template #loading><p>Loading...</p></ng-template>

@@ -1,0 +1,26 @@
+# Maven
+booking-backend/target/
+*.class
+
+# Application secrets (never commit)
+application-local.yml
+application-prod.yml
+*.env
+.env
+
+# Angular
+booking-frontend/node_modules/
+booking-frontend/dist/
+booking-frontend/.angular/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/

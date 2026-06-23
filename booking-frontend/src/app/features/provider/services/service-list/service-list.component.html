@@ -1,0 +1,23 @@
+<div class="page-header">
+  <h2>My Services</h2>
+  <a routerLink="/provider/services/add" class="btn-primary">+ Add Service</a>
+</div>
+
+<p *ngIf="loading">Loading services...</p>
+
+<div *ngIf="!loading && services.length === 0" class="empty-state">
+  <p>No services yet. Add your first service to get started.</p>
+  <a routerLink="/provider/services/add" class="btn-primary">Add Service</a>
+</div>
+
+<div class="service-grid" *ngIf="!loading && services.length > 0">
+  <div class="service-card" *ngFor="let service of services">
+    <h3>{{ service.name }}</h3>
+    <p class="description">{{ service.description }}</p>
+    <div class="service-meta">
+      <span>{{ service.durationMinutes }} min</span>
+      <span>{{ service.price | currency:service.currency }}</span>
+    </div>
+    <a [routerLink]="['/provider/services', service.id, 'edit']" class="btn-secondary">Edit</a>
+  </div>
+</div>
