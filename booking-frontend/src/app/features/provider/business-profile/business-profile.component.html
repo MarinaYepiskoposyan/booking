@@ -1,37 +1,119 @@
-<div class="form-container">
-  <h2>Business Profile</h2>
-  <div class="success-msg" *ngIf="success">Profile saved successfully!</div>
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label>Business Name *</label>
-      <input formControlName="businessName" placeholder="Your business name">
-      <span class="error" *ngIf="form.get('businessName')?.invalid && form.get('businessName')?.touched">
-        Business name is required
-      </span>
-    </div>
-    <div class="form-group">
-      <label>Description</label>
-      <textarea formControlName="description" rows="3" placeholder="Describe your services..."></textarea>
-    </div>
-    <div class="form-group">
-      <label>Address</label>
-      <input formControlName="address" placeholder="Street address">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>City</label>
-        <input formControlName="city" placeholder="City">
+<div class="page-wrapper">
+  <div class="page-header">
+    <h1>Business Profile</h1>
+    <p>Set up your provider details so clients can find and book you</p>
+  </div>
+
+  <div class="alert-success" *ngIf="success">
+    <span class="success-icon">&#10003;</span>
+    Business profile saved successfully!
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="sections">
+
+    <!-- Basic Info Section -->
+    <div class="card section">
+      <div class="section-header">
+        <span class="section-dot"></span>
+        <h2 class="section-title">Basic Information</h2>
       </div>
-      <div class="form-group">
-        <label>Country</label>
-        <input formControlName="country" placeholder="Country">
+
+      <div class="fields">
+        <div class="form-group">
+          <label class="form-label" for="bp-bizname">Business Name <span class="required">*</span></label>
+          <input
+            id="bp-bizname"
+            formControlName="businessName"
+            class="form-input"
+            placeholder="e.g. Jane's Hair Studio"
+          >
+          <span class="error-text" *ngIf="form.get('businessName')?.invalid && form.get('businessName')?.touched">
+            Business name is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="bp-desc">Description</label>
+          <textarea
+            id="bp-desc"
+            formControlName="description"
+            class="form-input"
+            rows="4"
+            placeholder="Tell clients what you offer, your experience, specialties..."
+          ></textarea>
+        </div>
       </div>
     </div>
-    <div class="form-group">
-      <label>Website</label>
-      <input formControlName="website" placeholder="https://...">
+
+    <!-- Location Section -->
+    <div class="card section">
+      <div class="section-header">
+        <span class="section-dot"></span>
+        <h2 class="section-title">Location</h2>
+      </div>
+
+      <div class="fields">
+        <div class="form-group">
+          <label class="form-label" for="bp-address">Street Address</label>
+          <input
+            id="bp-address"
+            formControlName="address"
+            class="form-input"
+            placeholder="123 Main Street, Suite 4"
+          >
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="bp-city">City</label>
+            <input
+              id="bp-city"
+              formControlName="city"
+              class="form-input"
+              placeholder="New York"
+            >
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="bp-country">Country</label>
+            <input
+              id="bp-country"
+              formControlName="country"
+              class="form-input"
+              placeholder="United States"
+            >
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="error" *ngIf="error">{{ error }}</div>
-    <button type="submit">Save Business Profile</button>
+
+    <!-- Online Presence Section -->
+    <div class="card section">
+      <div class="section-header">
+        <span class="section-dot"></span>
+        <h2 class="section-title">Online Presence</h2>
+      </div>
+
+      <div class="fields">
+        <div class="form-group">
+          <label class="form-label" for="bp-website">Website</label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">https://</span>
+            <input
+              id="bp-website"
+              formControlName="website"
+              class="form-input prefixed"
+              placeholder="yourbusiness.com"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-error" *ngIf="error">{{ error }}</div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Save Business Profile</button>
+    </div>
+
   </form>
 </div>

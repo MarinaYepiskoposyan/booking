@@ -1,0 +1,156 @@
+name: CD — Deploy to Google Cloud Run
+
+on:
+  push:
+    branches: [master]
+
+# Require CI to pass before this workflow runs.
+# Because both ci.yml and cd.yml trigger on push to master, GitHub will run
+# them concurrently by default. The concurrency group below ensures only one
+# CD run is active at a time, and the explicit `needs` on the deploy jobs
+# gates on the build jobs within THIS workflow.
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGION: ${{ secrets.REGION }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  REGISTRY: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/booking
+
+jobs:
+  build-backend:
+    name: Build & Push Backend Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # required for Workload Identity Federation
+
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push backend image
+        id: meta
+        env:
+          IMAGE: ${{ env.REGISTRY }}/backend:${{ github.sha }}
+        run: |
+          docker build \
+            --tag "$IMAGE" \
+            ./booking-backend
+          docker push "$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+  build-frontend:
+    name: Build & Push Frontend Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push frontend image
+        id: meta
+        env:
+          IMAGE: ${{ env.REGISTRY }}/frontend:${{ github.sha }}
+        run: |
+          docker build \
+            --tag "$IMAGE" \
+            ./booking-frontend
+          docker push "$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+  deploy-backend:
+    name: Deploy Backend to Cloud Run
+    needs: build-backend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: booking-backend
+          region: us-central1
+          image: ${{ needs.build-backend.outputs.image }}
+          flags: >
+            --port=8080
+            --allow-unauthenticated
+            --add-cloudsql-instances=${{ secrets.PROJECT_ID }}:us-central1:booking-mysql
+          env_vars: |
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            SPRING_DATASOURCE_URL=jdbc:mysql:///booking_db?cloudSqlInstance=${{ secrets.PROJECT_ID }}:us-central1:booking-mysql&socketFactory=com.google.cloud.sql.mysql.SocketFactory
+            SERVER_PORT=8080
+
+  deploy-frontend:
+    name: Deploy Frontend to Cloud Run
+    needs: [build-frontend, deploy-backend]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Get backend URL
+        id: backend-url
+        run: |
+          URL=$(gcloud run services describe booking-backend \
+            --region=us-central1 \
+            --format="value(status.url)")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: booking-frontend
+          region: us-central1
+          image: ${{ needs.build-frontend.outputs.image }}
+          flags: >
+            --port=80
+            --allow-unauthenticated
+          env_vars: |
+            BACKEND_URL=${{ steps.backend-url.outputs.url }}

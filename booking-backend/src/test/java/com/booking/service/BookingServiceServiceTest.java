@@ -17,6 +17,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -79,13 +84,15 @@ class BookingServiceServiceTest {
         Service s2 = Service.builder().id(2L).providerProfile(profile).name("Color")
                 .durationMinutes(90).price(new BigDecimal("80.00")).currency("USD").isActive(true).build();
 
+        Pageable pageable = PageRequest.of(0, 20);
         when(providerProfileRepository.findByUserId(1L)).thenReturn(Optional.of(profile));
-        when(serviceRepository.findByProviderProfileIdAndIsActiveTrue(1L)).thenReturn(List.of(s1, s2));
+        when(serviceRepository.findByProviderProfileIdAndIsActiveTrue(1L, pageable))
+                .thenReturn(new PageImpl<>(List.of(s1, s2)));
 
-        List<ServiceResponse> services = bookingServiceService.getMyServices(1L);
+        Page<ServiceResponse> services = bookingServiceService.getMyServices(1L, pageable);
 
-        assertThat(services).hasSize(2);
-        assertThat(services).extracting(ServiceResponse::getName).containsExactly("Haircut", "Color");
+        assertThat(services.getContent()).hasSize(2);
+        assertThat(services.getContent()).extracting(ServiceResponse::getName).containsExactly("Haircut", "Color");
     }
 
     @Test

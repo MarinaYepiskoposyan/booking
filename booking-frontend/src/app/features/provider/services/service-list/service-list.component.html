@@ -1,23 +1,54 @@
-<div class="page-header">
-  <h2>My Services</h2>
-  <a routerLink="/provider/services/add" class="btn-primary">+ Add Service</a>
-</div>
-
-<p *ngIf="loading">Loading services...</p>
-
-<div *ngIf="!loading && services.length === 0" class="empty-state">
-  <p>No services yet. Add your first service to get started.</p>
-  <a routerLink="/provider/services/add" class="btn-primary">Add Service</a>
-</div>
-
-<div class="service-grid" *ngIf="!loading && services.length > 0">
-  <div class="service-card" *ngFor="let service of services">
-    <h3>{{ service.name }}</h3>
-    <p class="description">{{ service.description }}</p>
-    <div class="service-meta">
-      <span>{{ service.durationMinutes }} min</span>
-      <span>{{ service.price | currency:service.currency }}</span>
+<div class="page-wrapper">
+  <div class="page-header">
+    <div class="header-text">
+      <h1>My Services</h1>
+      <p>Manage the services you offer to clients</p>
     </div>
-    <a [routerLink]="['/provider/services', service.id, 'edit']" class="btn-secondary">Edit</a>
+    <a routerLink="/provider/services/add" class="btn-primary">
+      <span class="btn-icon">+</span> Add Service
+    </a>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div class="service-grid" *ngIf="loading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+      <div class="skel skel-title"></div>
+      <div class="skel skel-text"></div>
+      <div class="skel skel-badges"></div>
+      <div class="skel skel-btn"></div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && services.length === 0">
+    <div class="empty-icon">&#9998;</div>
+    <h2>No services yet</h2>
+    <p>Add your first service so clients can start booking with you.</p>
+    <a routerLink="/provider/services/add" class="btn-primary">
+      <span class="btn-icon">+</span> Add Your First Service
+    </a>
+  </div>
+
+  <!-- Service grid -->
+  <div class="service-grid" *ngIf="!loading && services.length > 0">
+    <div class="service-card" *ngFor="let service of services">
+      <div class="card-top">
+        <div class="status-dot" [class.active]="service.isActive" [class.inactive]="!service.isActive"></div>
+        <span class="status-label">{{ service.isActive ? 'Active' : 'Inactive' }}</span>
+      </div>
+
+      <h3 class="service-name">{{ service.name }}</h3>
+      <p class="service-desc" *ngIf="service.description">{{ service.description }}</p>
+      <p class="service-desc muted" *ngIf="!service.description">No description</p>
+
+      <div class="badges">
+        <span class="badge badge-duration">&#9200; {{ service.durationMinutes }} min</span>
+        <span class="badge badge-price">{{ service.price | currency:service.currency }}</span>
+      </div>
+
+      <a [routerLink]="['/provider/services', service.id, 'edit']" class="btn-edit">
+        Edit Service
+      </a>
+    </div>
   </div>
 </div>

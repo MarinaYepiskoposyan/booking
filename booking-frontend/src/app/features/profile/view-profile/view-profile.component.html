@@ -1,9 +1,58 @@
-<div class="profile-card" *ngIf="user; else loading">
-  <h2>My Profile</h2>
-  <p><strong>Name:</strong> {{ user.firstName }} {{ user.lastName }}</p>
-  <p><strong>Email:</strong> {{ user.email }}</p>
-  <p><strong>Phone:</strong> {{ user.phone || '—' }}</p>
-  <p><strong>Role:</strong> {{ user.role === 'PROVIDER' ? 'Service Provider' : 'Client' }}</p>
-  <a routerLink="/profile/edit" class="btn">Edit Profile</a>
+<div class="page-wrapper">
+  <!-- Loading state -->
+  <div class="loading-state" *ngIf="!user">
+    <div class="skeleton-avatar"></div>
+    <div class="skeleton-lines">
+      <div class="skeleton-line wide"></div>
+      <div class="skeleton-line medium"></div>
+      <div class="skeleton-line narrow"></div>
+    </div>
+  </div>
+
+  <!-- Profile card -->
+  <div class="profile-card" *ngIf="user">
+    <div class="card-header">
+      <div class="avatar-circle">
+        {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+      </div>
+      <div class="header-info">
+        <h1 class="user-name">{{ user.firstName }} {{ user.lastName }}</h1>
+        <span class="role-badge" [class.role-provider]="user.role === 'PROVIDER'">
+          {{ user.role === 'PROVIDER' ? 'Service Provider' : 'Client' }}
+        </span>
+      </div>
+      <a routerLink="/profile/edit" class="btn-edit">Edit Profile</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="fields-grid">
+      <div class="field-row">
+        <span class="field-label">Email</span>
+        <span class="field-value">{{ user.email }}</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Phone</span>
+        <span class="field-value" [class.muted]="!user.phone">{{ user.phone || 'Not provided' }}</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Account type</span>
+        <span class="field-value">{{ user.role === 'PROVIDER' ? 'Service Provider' : 'Client' }}</span>
+      </div>
+    </div>
+
+    <div class="provider-actions" *ngIf="user.role === 'PROVIDER'">
+      <div class="divider"></div>
+      <div class="quick-links">
+        <a routerLink="/provider/setup" class="quick-link">
+          <span class="ql-icon">&#9998;</span>
+          Manage Business Profile
+        </a>
+        <a routerLink="/provider/services" class="quick-link">
+          <span class="ql-icon">&#9776;</span>
+          Manage Services
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
-<ng-template #loading><p>Loading...</p></ng-template>

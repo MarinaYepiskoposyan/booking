@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .phone(request.getPhone())
-                .role(request.getRole())
+                .role(com.booking.entity.UserRole.valueOf(request.getRole()))
                 .build();
 
         userRepository.save(user);

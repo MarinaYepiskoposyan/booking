@@ -18,9 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -45,7 +44,7 @@ class AuthServiceTest {
         registerRequest.setPassword("Password1!");
         registerRequest.setFirstName("John");
         registerRequest.setLastName("Doe");
-        registerRequest.setRole(UserRole.CLIENT);
+        registerRequest.setRole("CLIENT");
 
         savedUser = User.builder()
                 .id(1L)
@@ -90,7 +89,9 @@ class AuthServiceTest {
         loginRequest.setEmail("test@example.com");
         loginRequest.setPassword("Password1!");
 
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(savedUser));
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(savedUser);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(jwtService.generateToken(savedUser)).thenReturn("jwt.token.here");
 
         AuthResponse response = authService.login(loginRequest);
