@@ -9,9 +9,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  REGION: ${{ secrets.REGION }}
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  REGISTRY: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/booking
+  REGION: us-central1
+  PROJECT_ID: booking-app-free-2026
+  REGISTRY: us-central1-docker.pkg.dev/booking-app-free-2026/booking
 
 jobs:
   build-backend:
@@ -95,19 +95,19 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: booking-backend
-          region: ${{ secrets.REGION }}
+          region: us-central1
           image: ${{ needs.build-backend.outputs.image }}
           flags: >
             --port=8080
             --allow-unauthenticated
-            --add-cloudsql-instances=${{ secrets.CLOUD_SQL_CONNECTION }}
+            --add-cloudsql-instances=booking-app-free-2026:us-central1:booking-mysql
             --memory=512Mi
             --cpu=1
           env_vars: |
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             DB_USERNAME=${{ secrets.DB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            SPRING_DATASOURCE_URL=jdbc:mysql:///bookingdb?cloudSqlInstance=${{ secrets.CLOUD_SQL_CONNECTION }}&socketFactory=com.google.cloud.sql.mysql.SocketFactory&user=${{ secrets.DB_USERNAME }}&password=${{ secrets.DB_PASSWORD }}
+            SPRING_DATASOURCE_URL=jdbc:mysql:///bookingdb?cloudSqlInstance=booking-app-free-2026:us-central1:booking-mysql&socketFactory=com.google.cloud.sql.mysql.SocketFactory&user=${{ secrets.DB_USERNAME }}&password=${{ secrets.DB_PASSWORD }}
             SERVER_PORT=8080
             SPRING_JPA_HIBERNATE_DDL_AUTO=validate
 
@@ -128,8 +128,8 @@ jobs:
         id: backend-url
         run: |
           URL=$(gcloud run services describe booking-backend \
-            --region=${{ secrets.REGION }} \
-            --project=${{ secrets.PROJECT_ID }} \
+            --region=us-central1 \
+            --project=booking-app-free-2026 \
             --format="value(status.url)")
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
@@ -137,7 +137,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: booking-frontend
-          region: ${{ secrets.REGION }}
+          region: us-central1
           image: ${{ needs.build-frontend.outputs.image }}
           flags: >
             --port=80
