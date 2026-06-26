@@ -4,11 +4,6 @@ on:
   push:
     branches: [master]
 
-# Require CI to pass before this workflow runs.
-# Because both ci.yml and cd.yml trigger on push to master, GitHub will run
-# them concurrently by default. The concurrency group below ensures only one
-# CD run is active at a time, and the explicit `needs` on the deploy jobs
-# gates on the build jobs within THIS workflow.
 concurrency:
   group: cd-${{ github.ref }}
   cancel-in-progress: false
@@ -24,7 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write   # required for Workload Identity Federation
 
     outputs:
       image: ${{ steps.meta.outputs.image }}
@@ -34,11 +28,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
-        id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
@@ -59,7 +51,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
 
     outputs:
       image: ${{ steps.meta.outputs.image }}
@@ -71,8 +62,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
@@ -94,31 +84,32 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
 
     steps:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: booking-backend
-          region: us-central1
+          region: ${{ secrets.REGION }}
           image: ${{ needs.build-backend.outputs.image }}
           flags: >
             --port=8080
             --allow-unauthenticated
-            --add-cloudsql-instances=${{ secrets.PROJECT_ID }}:us-central1:booking-mysql
+            --add-cloudsql-instances=${{ secrets.CLOUD_SQL_CONNECTION }}
+            --memory=512Mi
+            --cpu=1
           env_vars: |
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             DB_USERNAME=${{ secrets.DB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            SPRING_DATASOURCE_URL=jdbc:mysql:///booking_db?cloudSqlInstance=${{ secrets.PROJECT_ID }}:us-central1:booking-mysql&socketFactory=com.google.cloud.sql.mysql.SocketFactory
+            SPRING_DATASOURCE_URL=jdbc:mysql:///bookingdb?cloudSqlInstance=${{ secrets.CLOUD_SQL_CONNECTION }}&socketFactory=com.google.cloud.sql.mysql.SocketFactory&user=${{ secrets.DB_USERNAME }}&password=${{ secrets.DB_PASSWORD }}
             SERVER_PORT=8080
+            SPRING_JPA_HIBERNATE_DDL_AUTO=validate
 
   deploy-frontend:
     name: Deploy Frontend to Cloud Run
@@ -126,20 +117,19 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
 
     steps:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Get backend URL
         id: backend-url
         run: |
           URL=$(gcloud run services describe booking-backend \
-            --region=us-central1 \
+            --region=${{ secrets.REGION }} \
+            --project=${{ secrets.PROJECT_ID }} \
             --format="value(status.url)")
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
@@ -147,10 +137,11 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: booking-frontend
-          region: us-central1
+          region: ${{ secrets.REGION }}
           image: ${{ needs.build-frontend.outputs.image }}
           flags: >
             --port=80
             --allow-unauthenticated
+            --memory=256Mi
           env_vars: |
             BACKEND_URL=${{ steps.backend-url.outputs.url }}
