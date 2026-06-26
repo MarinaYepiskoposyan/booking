@@ -4,8 +4,8 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 # Copy dependency manifests first to leverage layer caching
-COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts
+COPY package.json ./
+RUN npm install --ignore-scripts
 
 COPY . .
 RUN npx ng build --configuration production
