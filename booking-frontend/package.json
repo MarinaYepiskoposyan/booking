@@ -24,6 +24,10 @@
     "@angular-devkit/build-angular": "^17.0.0",
     "@angular/cli": "^17.0.0",
     "@angular/compiler-cli": "^17.0.0",
+    "@types/node": "20.14.0",
     "typescript": "~5.2.0"
+  },
+  "overrides": {
+    "@types/node": "20.14.0"
   }
 }
