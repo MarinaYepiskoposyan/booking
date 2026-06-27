@@ -16,7 +16,7 @@ public class RegisterRequest {
     @NotBlank private String firstName;
     @NotBlank private String lastName;
 
-    @Pattern(regexp = "^[+\\d\\s\\-()]{7,20}$", message = "Invalid phone number format")
+    @Pattern(regexp = "^$|^[+\\d\\s\\-()]{7,20}$", message = "Invalid phone number format")
     private String phone;
 
     // Role is accepted from client but restricted to CLIENT or PROVIDER — no admin self-assignment
