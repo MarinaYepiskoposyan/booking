@@ -182,6 +182,12 @@ import { AuthService } from '../../../core/services/auth.service';
       font-weight: 500;
     }
 
+    .hint-text {
+      font-size: 12px;
+      color: #6B7280;
+      margin-top: 2px;
+    }
+
     @media (max-width: 480px) {
       .auth-card {
         padding: 32px 24px;
@@ -216,7 +222,11 @@ export class RegisterComponent {
         this.router.navigate([res.user.role === 'PROVIDER' ? '/provider/setup' : '/profile']);
       },
       error: (err) => {
-        this.error = err.error?.message || 'Registration failed. Please try again.';
+        if (err.error?.errors) {
+          this.error = Object.values(err.error.errors).join(' ');
+        } else {
+          this.error = err.error?.message || 'Registration failed. Please try again.';
+        }
         this.loading = false;
       }
     });
