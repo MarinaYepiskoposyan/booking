@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/api'
+  apiUrl: 'https://booking-backend-ymv7yhp6mq-uc.a.run.app/api'
 };
