@@ -17,7 +17,8 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
             "http://localhost:4200",
-            "https://booking-frontend-ymv7yhp6mq-uc.a.run.app"
+            "https://booking-frontend-ymv7yhp6mq-uc.a.run.app",
+            "https://booking-frontend-872770026786.us-central1.run.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
@@ -35,7 +36,8 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
             "http://localhost:4200",
-            "https://booking-frontend-ymv7yhp6mq-uc.a.run.app"
+            "https://booking-frontend-ymv7yhp6mq-uc.a.run.app",
+            "https://booking-frontend-872770026786.us-central1.run.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
