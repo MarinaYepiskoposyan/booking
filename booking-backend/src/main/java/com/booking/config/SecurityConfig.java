@@ -5,6 +5,7 @@ import com.booking.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -39,7 +40,15 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/providers").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                // Public: view a specific provider's availability schedule
+                .requestMatchers(HttpMethod.GET, "/api/provider/availability/*").permitAll()
+                // Public: view available time slots for a provider on a date
+                .requestMatchers(HttpMethod.GET, "/api/slots/**").permitAll()
+                // Provider-only: manage availability and generate slots
+                .requestMatchers(HttpMethod.PUT, "/api/provider/availability").hasRole("PROVIDER")
+                .requestMatchers(HttpMethod.POST, "/api/provider/slots/generate").hasRole("PROVIDER")
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())

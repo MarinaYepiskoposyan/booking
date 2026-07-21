@@ -14,6 +14,7 @@ import { AuthService } from '../../../core/services/auth.service';
         Bookify
       </a>
       <div class="nav-links">
+        <a routerLink="/providers" class="nav-link">Find Providers</a>
         <ng-container *ngIf="authService.currentUser$ | async as user; else guestLinks">
           <a routerLink="/profile" class="nav-link">
             <span class="avatar">{{ user.firstName.charAt(0) }}</span>

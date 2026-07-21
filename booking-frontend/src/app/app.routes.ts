@@ -48,5 +48,9 @@ export const routes: Routes = [
       }
     ]
   },
+  {
+    path: 'providers',
+    loadComponent: () => import('./features/providers/provider-list/provider-list.component').then(m => m.ProviderListComponent)
+  },
   { path: '**', redirectTo: '/login' }
 ];

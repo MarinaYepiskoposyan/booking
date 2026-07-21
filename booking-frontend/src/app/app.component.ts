@@ -13,7 +13,11 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
     </main>
   `,
   styles: [`
-    .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 88px 24px 40px;
+    }
   `]
 })
 export class AppComponent {}

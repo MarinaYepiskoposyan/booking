@@ -1,0 +1,106 @@
+<div class="providers-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Find Providers</h1>
+    <p>Browse and discover service providers near you</p>
+  </div>
+
+  <!-- Filters Bar -->
+  <form [formGroup]="filterForm" class="filters-bar">
+    <div class="search-wrap">
+      <span class="search-icon">&#128269;</span>
+      <input
+        formControlName="search"
+        type="text"
+        class="search-input"
+        placeholder="Search by name or description..."
+        autocomplete="off"
+      />
+    </div>
+    <select formControlName="city" class="city-select">
+      <option value="">All cities</option>
+      <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+    </select>
+  </form>
+
+  <!-- Results meta -->
+  <div class="results-meta" *ngIf="!loading">
+    {{ totalElements }} provider{{ totalElements !== 1 ? 's' : '' }} found
+    <ng-container *ngIf="hasFilters"> matching your filters</ng-container>
+  </div>
+
+  <!-- Loading Skeleton -->
+  <div class="provider-grid" *ngIf="loading">
+    <div class="skeleton-card" *ngFor="let s of skeletons">
+      <div class="skel skel-title"></div>
+      <div class="skel skel-city"></div>
+      <div class="skel skel-text"></div>
+      <div class="skel skel-text-short"></div>
+      <div class="skel skel-badges"></div>
+    </div>
+  </div>
+
+  <!-- Provider Grid -->
+  <ng-container *ngIf="!loading">
+    <div class="provider-grid" *ngIf="providers.length > 0">
+      <div class="provider-card" *ngFor="let provider of providers">
+        <div class="card-header">
+          <div class="business-name">{{ provider.businessName }}</div>
+          <span class="city-badge" *ngIf="provider.city">
+            &#128205; {{ provider.city }}
+          </span>
+        </div>
+
+        <p
+          class="description"
+          [class.muted]="!provider.description"
+        >
+          {{ provider.description || 'No description provided.' }}
+        </p>
+
+        <div class="services-section">
+          <div class="services-label">Services</div>
+          <div class="service-tags" *ngIf="provider.services && provider.services.length > 0; else noServices">
+            <span class="service-tag" *ngFor="let svc of provider.services">{{ svc }}</span>
+            <span class="service-count" *ngIf="provider.serviceCount > 3">
+              +{{ provider.serviceCount - 3 }} more
+            </span>
+          </div>
+          <ng-template #noServices>
+            <span class="no-services">No services listed yet</span>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="providers.length === 0">
+      <div class="empty-icon">&#128269;</div>
+      <h2>No providers found</h2>
+      <p *ngIf="hasFilters">No providers match your search. Try adjusting your filters or search terms.</p>
+      <p *ngIf="!hasFilters">There are no providers available at the moment. Check back later.</p>
+      <button class="btn-clear" *ngIf="hasFilters" (click)="clearFilters()">Clear filters</button>
+    </div>
+  </ng-container>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!loading && totalPages > 1">
+    <button
+      class="btn-page"
+      (click)="goToPrevPage()"
+      [disabled]="currentPage === 0"
+    >
+      &#8592; Previous
+    </button>
+    <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+    <button
+      class="btn-page"
+      (click)="goToNextPage()"
+      [disabled]="currentPage >= totalPages - 1"
+    >
+      Next &#8594;
+    </button>
+  </div>
+
+</div>
