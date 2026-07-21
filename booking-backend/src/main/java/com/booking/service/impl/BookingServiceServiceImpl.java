@@ -49,6 +49,16 @@ public class BookingServiceServiceImpl implements BookingServiceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public ServiceResponse getServiceById(Long userId, Long serviceId) {
+        ProviderProfile profile = providerProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found."));
+        Service service = serviceRepository.findByIdAndProviderProfileId(serviceId, profile.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Service", serviceId));
+        return mapToResponse(service);
+    }
+
+    @Override
     @Transactional
     public ServiceResponse updateService(Long userId, Long serviceId, ServiceRequest request) {
         ProviderProfile profile = providerProfileRepository.findByUserId(userId)

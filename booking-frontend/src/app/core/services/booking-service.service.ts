@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { BookingService, ServiceRequest } from '../models/service.model';
 
@@ -11,7 +12,13 @@ export class BookingServiceService {
   constructor(private http: HttpClient) {}
 
   getMyServices(): Observable<BookingService[]> {
-    return this.http.get<BookingService[]>(this.baseUrl);
+    return this.http.get<{ content: BookingService[] }>(this.baseUrl).pipe(
+      map(page => page.content)
+    );
+  }
+
+  getServiceById(id: number): Observable<BookingService> {
+    return this.http.get<BookingService>(`${this.baseUrl}/${id}`);
   }
 
   addService(request: ServiceRequest): Observable<BookingService> {

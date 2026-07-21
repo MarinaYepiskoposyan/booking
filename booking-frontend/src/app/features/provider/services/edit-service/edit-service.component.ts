@@ -308,9 +308,9 @@ export class EditServiceComponent implements OnInit {
       price: [null, [Validators.required, Validators.min(0.01)]],
       currency: ['USD']
     });
-    this.bookingServiceService.getMyServices().subscribe(services => {
-      const service = services.find(s => s.id === this.serviceId);
-      if (service) this.form.patchValue(service);
+    this.bookingServiceService.getServiceById(this.serviceId).subscribe({
+      next: service => this.form.patchValue(service),
+      error: () => { this.error = 'Failed to load service details.'; }
     });
   }
 

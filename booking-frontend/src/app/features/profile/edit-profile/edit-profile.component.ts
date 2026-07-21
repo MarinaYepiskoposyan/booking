@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-edit-profile',
@@ -192,7 +193,7 @@ export class EditProfileComponent implements OnInit {
   success = false;
   error = '';
 
-  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {}
+  constructor(private fb: FormBuilder, private userService: UserService, private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -205,8 +206,13 @@ export class EditProfileComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.invalid) return;
+    this.error = '';
     this.userService.updateProfile(this.form.value).subscribe({
-      next: () => { this.success = true; setTimeout(() => this.router.navigate(['/profile']), 1500); },
+      next: (updatedUser) => {
+        this.authService.updateCurrentUser(updatedUser);
+        this.success = true;
+        setTimeout(() => this.router.navigate(['/profile']), 1500);
+      },
       error: () => { this.error = 'Update failed. Please try again.'; }
     });
   }

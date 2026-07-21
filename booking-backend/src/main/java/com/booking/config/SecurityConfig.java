@@ -40,7 +40,7 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/providers").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/providers/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 // Public: view a specific provider's availability schedule
                 .requestMatchers(HttpMethod.GET, "/api/provider/availability/*").permitAll()
@@ -49,6 +49,11 @@ public class SecurityConfig {
                 // Provider-only: manage availability and generate slots
                 .requestMatchers(HttpMethod.PUT, "/api/provider/availability").hasRole("PROVIDER")
                 .requestMatchers(HttpMethod.POST, "/api/provider/slots/generate").hasRole("PROVIDER")
+                // Client-only: create a booking
+                .requestMatchers(HttpMethod.POST, "/api/bookings").hasRole("CLIENT")
+                // Authenticated: view and cancel own bookings
+                .requestMatchers(HttpMethod.GET, "/api/bookings/my").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/bookings/*").authenticated()
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())

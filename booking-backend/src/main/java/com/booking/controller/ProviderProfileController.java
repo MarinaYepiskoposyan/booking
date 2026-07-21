@@ -1,6 +1,7 @@
 package com.booking.controller;
 
 import com.booking.dto.request.ProviderProfileRequest;
+import com.booking.dto.response.ProviderDetailResponse;
 import com.booking.dto.response.ProviderListItemResponse;
 import com.booking.dto.response.ProviderProfileResponse;
 import com.booking.entity.User;
@@ -39,5 +40,10 @@ public class ProviderProfileController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(providerProfileService.getProviders(search, city, pageable));
+    }
+
+    @GetMapping("/api/providers/{providerProfileId}")
+    public ResponseEntity<ProviderDetailResponse> getProviderById(@PathVariable Long providerProfileId) {
+        return ResponseEntity.ok(providerProfileService.getProviderById(providerProfileId));
     }
 }

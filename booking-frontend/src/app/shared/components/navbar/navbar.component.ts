@@ -20,6 +20,7 @@ import { AuthService } from '../../../core/services/auth.service';
             <span class="avatar">{{ user.firstName.charAt(0) }}</span>
             {{ user.firstName }}
           </a>
+          <a *ngIf="user.role === 'CLIENT'" routerLink="/bookings/my" class="nav-link">My Bookings</a>
           <a *ngIf="user.role === 'PROVIDER'" routerLink="/provider/setup" class="nav-link">My Business</a>
           <a *ngIf="user.role === 'PROVIDER'" routerLink="/provider/services" class="nav-link">Services</a>
           <button (click)="logout()" class="btn-logout">Logout</button>

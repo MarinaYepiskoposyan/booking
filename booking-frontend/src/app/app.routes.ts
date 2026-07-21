@@ -52,5 +52,18 @@ export const routes: Routes = [
     path: 'providers',
     loadComponent: () => import('./features/providers/provider-list/provider-list.component').then(m => m.ProviderListComponent)
   },
+  {
+    path: 'providers/:id',
+    loadComponent: () => import('./features/providers/provider-detail/provider-detail.component').then(m => m.ProviderDetailComponent)
+  },
+  {
+    path: 'booking/confirmation',
+    loadComponent: () => import('./features/bookings/booking-confirmation/booking-confirmation.component').then(m => m.BookingConfirmationComponent)
+  },
+  {
+    path: 'bookings/my',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/bookings/my-bookings/my-bookings.component').then(m => m.MyBookingsComponent)
+  },
   { path: '**', redirectTo: '/login' }
 ];

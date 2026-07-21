@@ -36,3 +36,29 @@ export interface Page<T> {
   first: boolean;
   last: boolean;
 }
+
+export interface ProviderServiceItem {
+  id: number;
+  name: string;
+  description?: string;
+  durationMinutes: number;
+  price: number;
+  currency: string;
+}
+
+export interface ProviderDetail {
+  providerProfileId: number;
+  businessName: string;
+  description?: string;
+  address?: string;
+  city?: string;
+  website?: string;
+  services: ProviderServiceItem[];
+}
+
+export interface TimeSlot {
+  id: number;
+  startTime: string;
+  endTime: string;
+  status: 'AVAILABLE' | 'BOOKED' | 'BLOCKED';
+}

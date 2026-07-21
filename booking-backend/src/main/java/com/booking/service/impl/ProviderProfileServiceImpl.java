@@ -1,6 +1,7 @@
 package com.booking.service.impl;
 
 import com.booking.dto.request.ProviderProfileRequest;
+import com.booking.dto.response.ProviderDetailResponse;
 import com.booking.dto.response.ProviderListItemResponse;
 import com.booking.dto.response.ProviderProfileResponse;
 import com.booking.entity.ProviderProfile;
@@ -83,6 +84,36 @@ public class ProviderProfileServiceImpl implements ProviderProfileService {
                     .services(top3Names)
                     .build();
         });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProviderDetailResponse getProviderById(Long id) {
+        ProviderProfile profile = providerProfileRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Provider profile", id));
+
+        List<Service> activeServices = serviceRepository.findByProviderProfileIdAndIsActiveTrue(id);
+
+        List<ProviderDetailResponse.ServiceItem> serviceItems = activeServices.stream()
+                .map(svc -> ProviderDetailResponse.ServiceItem.builder()
+                        .id(svc.getId())
+                        .name(svc.getName())
+                        .description(svc.getDescription())
+                        .durationMinutes(svc.getDurationMinutes())
+                        .price(svc.getPrice())
+                        .currency(svc.getCurrency())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ProviderDetailResponse.builder()
+                .providerProfileId(profile.getId())
+                .businessName(profile.getBusinessName())
+                .description(profile.getDescription())
+                .address(profile.getAddress())
+                .city(profile.getCity())
+                .website(profile.getWebsite())
+                .services(serviceItems)
+                .build();
     }
 
     private ProviderProfileResponse mapToResponse(ProviderProfile p) {

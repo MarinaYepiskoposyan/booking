@@ -8,5 +8,6 @@ import org.springframework.data.domain.Pageable;
 public interface BookingServiceService {
     ServiceResponse addService(Long userId, ServiceRequest request);
     Page<ServiceResponse> getMyServices(Long userId, Pageable pageable);
+    ServiceResponse getServiceById(Long userId, Long serviceId);
     ServiceResponse updateService(Long userId, Long serviceId, ServiceRequest request);
 }

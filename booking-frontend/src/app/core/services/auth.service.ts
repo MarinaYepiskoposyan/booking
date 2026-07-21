@@ -55,6 +55,10 @@ export class AuthService {
     return this.currentUserSubject.value?.role === 'PROVIDER';
   }
 
+  updateCurrentUser(user: User): void {
+    this.currentUserSubject.next(user);
+  }
+
   private handleAuth(res: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, res.token);
     this.currentUserSubject.next(res.user);

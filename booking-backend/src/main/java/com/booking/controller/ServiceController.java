@@ -33,6 +33,12 @@ public class ServiceController {
         return ResponseEntity.ok(bookingServiceService.getMyServices(currentUser.getId(), pageable));
     }
 
+    @GetMapping("/{serviceId}")
+    public ResponseEntity<ServiceResponse> getServiceById(@AuthenticationPrincipal User currentUser,
+                                                           @PathVariable Long serviceId) {
+        return ResponseEntity.ok(bookingServiceService.getServiceById(currentUser.getId(), serviceId));
+    }
+
     @PutMapping("/{serviceId}")
     public ResponseEntity<ServiceResponse> updateService(@AuthenticationPrincipal User currentUser,
                                                           @PathVariable Long serviceId,

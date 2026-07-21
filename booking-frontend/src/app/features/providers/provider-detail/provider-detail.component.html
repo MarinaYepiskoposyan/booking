@@ -1,0 +1,126 @@
+<div class="detail-page">
+
+  <a class="back-link" routerLink="/providers">&#8592; Back to Providers</a>
+
+  <!-- Loading Skeleton -->
+  <ng-container *ngIf="loading">
+    <div class="skeleton-wrap">
+      <div class="skel skel-h1"></div>
+      <div class="skel skel-sub"></div>
+      <div class="skel skel-p"></div>
+      <div class="skel skel-p-s"></div>
+      <div class="skel skel-card"></div>
+      <div class="skel skel-card"></div>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngIf="!loading && error">
+    <div class="error-box">
+      <h2>Provider Not Found</h2>
+      <p>We couldn't find this provider. They may have been removed or the link is incorrect.</p>
+    </div>
+  </ng-container>
+
+  <!-- Provider Detail -->
+  <ng-container *ngIf="!loading && !error && provider">
+
+    <!-- Header Card -->
+    <div class="provider-header">
+      <h1>{{ provider.businessName }}</h1>
+
+      <div class="meta-row">
+        <span class="city-badge" *ngIf="provider.city">&#128205; {{ provider.city }}</span>
+        <span class="address-text" *ngIf="provider.address">{{ provider.address }}</span>
+        <a
+          class="website-link"
+          *ngIf="provider.website"
+          [href]="provider.website"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          &#127760; {{ provider.website }}
+        </a>
+      </div>
+
+      <p class="description-text" *ngIf="provider.description">{{ provider.description }}</p>
+    </div>
+
+    <!-- Services -->
+    <div class="services-section">
+      <div class="section-title">Services Offered</div>
+
+      <p class="no-services" *ngIf="provider.services.length === 0">
+        This provider has not listed any services yet.
+      </p>
+
+      <div class="service-card" *ngFor="let svc of provider.services">
+        <div class="service-info">
+          <div class="service-name">{{ svc.name }}</div>
+          <p class="service-desc" *ngIf="svc.description">{{ svc.description }}</p>
+          <div class="service-meta">
+            <span class="service-meta-item">&#128337; {{ svc.durationMinutes }} min</span>
+            <span class="service-meta-item">{{ formatPrice(svc.price, svc.currency) }}</span>
+          </div>
+        </div>
+        <button
+          class="btn-book-service"
+          disabled
+          title="Select a time slot first"
+        >
+          Book
+        </button>
+      </div>
+    </div>
+
+    <!-- Availability & Slots -->
+    <div class="slots-section">
+      <div class="section-title">Check Availability</div>
+
+      <div class="date-row">
+        <label class="date-label" for="slot-date">Select a date:</label>
+        <input
+          id="slot-date"
+          type="date"
+          class="date-input"
+          [min]="minDate"
+          [(ngModel)]="selectedDate"
+          (change)="onDateChange()"
+        />
+      </div>
+
+      <!-- Slots Loading -->
+      <div class="slots-loading" *ngIf="slotsLoading">
+        <div class="spinner"></div>
+        <span>Loading available slots…</span>
+      </div>
+
+      <!-- Slots Grid -->
+      <ng-container *ngIf="slotsLoaded && !slotsLoading">
+        <div class="slots-grid" *ngIf="slots.length > 0">
+          <div
+            *ngFor="let slot of slots"
+            [class]="slotClass(slot)"
+            (click)="selectSlot(slot)"
+          >
+            {{ slot.startTime }}
+          </div>
+        </div>
+
+        <p class="no-slots" *ngIf="slots.length === 0">
+          No time slots available for this date.
+        </p>
+
+        <!-- Book Button -->
+        <ng-container *ngIf="selectedSlotId !== null">
+          <button class="btn-book-slot" disabled>
+            &#128337; Book this slot
+          </button>
+          <p class="slots-prompt">Booking will be available in an upcoming release.</p>
+        </ng-container>
+      </ng-container>
+    </div>
+
+  </ng-container>
+
+</div>

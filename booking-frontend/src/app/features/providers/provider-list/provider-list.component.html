@@ -44,7 +44,7 @@
   <!-- Provider Grid -->
   <ng-container *ngIf="!loading">
     <div class="provider-grid" *ngIf="providers.length > 0">
-      <div class="provider-card" *ngFor="let provider of providers">
+      <div class="provider-card" *ngFor="let provider of providers" [routerLink]="['/providers', provider.providerProfileId]" style="cursor:pointer">
         <div class="card-header">
           <div class="business-name">{{ provider.businessName }}</div>
           <span class="city-badge" *ngIf="provider.city">
