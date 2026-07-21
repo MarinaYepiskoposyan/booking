@@ -2,6 +2,8 @@ package com.booking.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -19,6 +21,7 @@ public class Availability {
     private ProviderProfile providerProfile;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "day_of_week", nullable = false, length = 20)
     private DayOfWeek dayOfWeek;
 
