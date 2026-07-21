@@ -2,6 +2,8 @@ package com.booking.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +36,7 @@ public class TimeSlot {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(nullable = false, length = 20)
     private SlotStatus status = SlotStatus.AVAILABLE;
 
