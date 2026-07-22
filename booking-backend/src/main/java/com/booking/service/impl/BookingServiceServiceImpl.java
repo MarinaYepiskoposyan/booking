@@ -76,6 +76,19 @@ public class BookingServiceServiceImpl implements BookingServiceService {
         return mapToResponse(serviceRepository.save(service));
     }
 
+    @Override
+    @Transactional
+    public void deactivateService(Long userId, Long serviceId) {
+        ProviderProfile profile = providerProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Provider profile not found."));
+
+        Service service = serviceRepository.findByIdAndProviderProfileId(serviceId, profile.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Service", serviceId));
+
+        service.setIsActive(false);
+        serviceRepository.save(service);
+    }
+
     private ServiceResponse mapToResponse(Service s) {
         return ServiceResponse.builder()
                 .id(s.getId())

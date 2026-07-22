@@ -242,6 +242,40 @@ import { BookingService } from '../../../../core/models/service.model';
       color: #4F46E5;
     }
 
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .card-actions .btn-edit {
+      flex: 1;
+      margin-top: 0;
+    }
+
+    .btn-delete {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 16px;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      color: #6B7280;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      min-height: 44px;
+      flex: 1;
+    }
+
+    .btn-delete:hover {
+      background: #FEF2F2;
+      border-color: #EF4444;
+      color: #EF4444;
+    }
+
     @media (max-width: 600px) {
       .page-header {
         flex-direction: column;
@@ -263,6 +297,17 @@ export class ServiceListComponent implements OnInit {
     this.bookingServiceService.getMyServices().subscribe({
       next: (services) => { this.services = services; this.loading = false; },
       error: () => { this.loading = false; }
+    });
+  }
+
+  onDelete(serviceId: number): void {
+    if (!confirm('Are you sure you want to delete this service? This action cannot be undone.')) {
+      return;
+    }
+    this.bookingServiceService.deleteService(serviceId).subscribe({
+      next: () => {
+        this.services = this.services.filter(s => s.id !== serviceId);
+      }
     });
   }
 }

@@ -45,6 +45,10 @@ export const routes: Routes = [
       {
         path: 'services/:id/edit',
         loadComponent: () => import('./features/provider/services/edit-service/edit-service.component').then(m => m.EditServiceComponent)
+      },
+      {
+        path: 'bookings',
+        loadComponent: () => import('./features/bookings/provider-bookings/provider-bookings.component').then(m => m.ProviderBookingsComponent)
       }
     ]
   },

@@ -23,6 +23,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <a *ngIf="user.role === 'CLIENT'" routerLink="/bookings/my" class="nav-link">My Bookings</a>
           <a *ngIf="user.role === 'PROVIDER'" routerLink="/provider/setup" class="nav-link">My Business</a>
           <a *ngIf="user.role === 'PROVIDER'" routerLink="/provider/services" class="nav-link">Services</a>
+          <a *ngIf="user.role === 'PROVIDER'" routerLink="/provider/bookings" class="nav-link">Appointments</a>
           <button (click)="logout()" class="btn-logout">Logout</button>
         </ng-container>
         <ng-template #guestLinks>

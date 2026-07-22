@@ -49,6 +49,10 @@ public class SecurityConfig {
                 // Provider-only: manage availability and generate slots
                 .requestMatchers(HttpMethod.PUT, "/api/provider/availability").hasRole("PROVIDER")
                 .requestMatchers(HttpMethod.POST, "/api/provider/slots/generate").hasRole("PROVIDER")
+                // Provider-only: view and manage their bookings
+                .requestMatchers(HttpMethod.GET, "/api/provider/bookings").hasRole("PROVIDER")
+                .requestMatchers(HttpMethod.PATCH, "/api/provider/bookings/*/complete").hasRole("PROVIDER")
+                .requestMatchers(HttpMethod.DELETE, "/api/provider/bookings/*").hasRole("PROVIDER")
                 // Client-only: create a booking
                 .requestMatchers(HttpMethod.POST, "/api/bookings").hasRole("CLIENT")
                 // Authenticated: view and cancel own bookings

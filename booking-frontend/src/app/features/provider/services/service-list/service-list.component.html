@@ -46,9 +46,14 @@
         <span class="badge badge-price">{{ service.price | currency:service.currency }}</span>
       </div>
 
-      <a [routerLink]="['/provider/services', service.id, 'edit']" class="btn-edit">
-        Edit Service
-      </a>
+      <div class="card-actions">
+        <a [routerLink]="['/provider/services', service.id, 'edit']" class="btn-edit">
+          Edit
+        </a>
+        <button class="btn-delete" (click)="onDelete(service.id)">
+          Delete
+        </button>
+      </div>
     </div>
   </div>
 </div>

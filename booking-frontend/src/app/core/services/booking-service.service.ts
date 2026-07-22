@@ -28,4 +28,8 @@ export class BookingServiceService {
   updateService(serviceId: number, request: ServiceRequest): Observable<BookingService> {
     return this.http.put<BookingService>(`${this.baseUrl}/${serviceId}`, request);
   }
+
+  deleteService(serviceId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${serviceId}`);
+  }
 }

@@ -12,4 +12,10 @@ public interface BookingService {
     List<BookingResponse> getMyBookings(Long clientId);
 
     void cancelBooking(Long bookingId, Long clientId);
+
+    List<BookingResponse> getProviderBookings(Long providerUserId);
+
+    BookingResponse completeBooking(Long bookingId, Long providerUserId);
+
+    void cancelBookingByProvider(Long bookingId, Long providerUserId);
 }

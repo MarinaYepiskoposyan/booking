@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Data @Builder
 public class BookingResponse {
     private Long id;
+    private String clientName;
     private String providerName;
     private String serviceName;
     private String slotDate;

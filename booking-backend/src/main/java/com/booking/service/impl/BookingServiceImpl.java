@@ -80,9 +80,46 @@ public class BookingServiceImpl implements BookingService {
         timeSlotRepository.save(slot);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookingResponse> getProviderBookings(Long providerUserId) {
+        return bookingRepository.findByProviderUserIdWithDetails(providerUserId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public BookingResponse completeBooking(Long bookingId, Long providerUserId) {
+        Booking booking = bookingRepository.findByIdAndProviderProfileUserId(bookingId, providerUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", bookingId));
+        booking.setStatus(BookingStatus.CONFIRMED);
+        return mapToResponse(bookingRepository.save(booking));
+    }
+
+    @Override
+    @Transactional
+    public void cancelBookingByProvider(Long bookingId, Long providerUserId) {
+        Booking booking = bookingRepository.findByIdAndProviderProfileUserId(bookingId, providerUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", bookingId));
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+
+        TimeSlot slot = booking.getTimeSlot();
+        slot.setStatus(SlotStatus.AVAILABLE);
+        timeSlotRepository.save(slot);
+    }
+
     private BookingResponse mapToResponse(Booking booking) {
         TimeSlot slot = booking.getTimeSlot();
         ProviderProfile profile = booking.getProviderProfile();
+        User client = booking.getClient();
+
+        String clientName = null;
+        if (client != null) {
+            clientName = client.getFirstName() + " " + client.getLastName();
+        }
 
         String serviceName = null;
         if (booking.getService() != null) {
@@ -93,6 +130,7 @@ public class BookingServiceImpl implements BookingService {
 
         return BookingResponse.builder()
                 .id(booking.getId())
+                .clientName(clientName)
                 .providerName(profile.getBusinessName())
                 .serviceName(serviceName)
                 .slotDate(slot.getSlotDate().toString())

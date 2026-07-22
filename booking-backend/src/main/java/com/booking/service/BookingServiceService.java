@@ -10,4 +10,5 @@ public interface BookingServiceService {
     Page<ServiceResponse> getMyServices(Long userId, Pageable pageable);
     ServiceResponse getServiceById(Long userId, Long serviceId);
     ServiceResponse updateService(Long userId, Long serviceId, ServiceRequest request);
+    void deactivateService(Long userId, Long serviceId);
 }

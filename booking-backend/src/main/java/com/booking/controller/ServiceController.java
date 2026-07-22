@@ -45,4 +45,11 @@ public class ServiceController {
                                                           @Valid @RequestBody ServiceRequest request) {
         return ResponseEntity.ok(bookingServiceService.updateService(currentUser.getId(), serviceId, request));
     }
+
+    @DeleteMapping("/{serviceId}")
+    public ResponseEntity<Void> deactivateService(@AuthenticationPrincipal User currentUser,
+                                                   @PathVariable Long serviceId) {
+        bookingServiceService.deactivateService(currentUser.getId(), serviceId);
+        return ResponseEntity.noContent().build();
+    }
 }

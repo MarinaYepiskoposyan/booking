@@ -21,4 +21,16 @@ export class BookingService {
   cancelBooking(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  getProviderBookings(): Observable<BookingResponse[]> {
+    return this.http.get<BookingResponse[]>(`${environment.apiUrl}/provider/bookings`);
+  }
+
+  completeBooking(id: number): Observable<BookingResponse> {
+    return this.http.patch<BookingResponse>(`${environment.apiUrl}/provider/bookings/${id}/complete`, {});
+  }
+
+  cancelBookingByProvider(id: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/provider/bookings/${id}`);
+  }
 }

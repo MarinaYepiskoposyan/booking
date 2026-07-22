@@ -6,6 +6,7 @@ export interface BookingRequest {
 
 export interface BookingResponse {
   id: number;
+  clientName?: string;
   providerName: string;
   serviceName?: string;
   slotDate: string;
